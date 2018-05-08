@@ -16,6 +16,7 @@ select a.name, b.title from member a, board b
 select a.name, a.id, b.title, b.content, c.authority
 	from member a, board b, auth c
 	where a.id = b.id
+	and a.authcode = c.authcode
 	and c.authority = '회원';
 
 
