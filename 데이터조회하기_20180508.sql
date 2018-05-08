@@ -1,0 +1,136 @@
+-- 사용자 조건 입력받기
+
+SELECT *
+    FROM KOPO_PROMOTION
+    WHERE 1=1
+    AND TARGETWEEK 
+        BETWEEN &STARTWEEK AND &ENDWEEK
+    ORDER BY TARGETWEEK; 
+
+
+-- 데이터 정렬하기
+-- CASE WHEN 사용하여 N/A => Male = > Female 순 정렬
+
+SELECT DISTINCT GENDER
+FROM KOPO_CUSTOMERDATA;
+
+SELECT A.*,
+        -- LOWER (소문자변환), UPPER (대문자변환)
+        -- 대,소문자가 섞여있을 때는 한가지로 통일하는 것도 방법
+        -- WHEN LOWER(A.GENDER) = 'not available'
+        -- WHEN UPPER(A.GENDER) = 'MALE'  
+        CASE WHEN A.GENDER = 'Not Available'
+             THEN 0
+             WHEN A.GENDER = 'Male'  -- 따옴표 안의 문자열은 대소문자 구분함
+             THEN 1
+             ELSE 2 END AS SORT_ORDER
+FROM KOPO_CUSTOMERDATA A
+ORDER BY SORT_ORDER;
+
+
+-- 두 개 컬럼 이상 기준으로 정렬하기
+
+SELECT *
+    FROM KOPO_PRODUCT_VOLUME
+    ORDER BY REGIONID, PRODUCTGROUP, YEARWEEK;
+
+
+-- 집합연산자: Union
+
+SELECT *
+FROM KOPO_PRODUCT_VOLUME
+WHERE PRODUCTGROUP = 'ST0001'
+    UNION
+SELECT *
+FROM KOPO_PRODUCT_VOLUME
+WHERE PRODUCTGROUP = 'ST00002';
+
+
+-- 집합연산자: Intersect
+
+SELECT *
+FROM KOPO_PRODUCT_VOLUME
+WHERE PRODUCTGROUP = 'ST0001'
+    INTERSECT
+SELECT *
+FROM KOPO_PRODUCT_VOLUME
+WHERE PRODUCTGROUP = 'ST00002';
+
+
+-- 집합연산자: Minus
+
+SELECT *
+FROM KOPO_PRODUCT_VOLUME
+WHERE PRODUCTGROUP = 'ST0001'
+    MINUS
+SELECT *
+FROM KOPO_PRODUCT_VOLUME
+WHERE PRODUCTGROUP = 'ST00002';
+
+
+-- MINUS + NOT IN 활용
+
+SELECT *
+FROM KOPO_PRODUCT_VOLUME
+WHERE 1=1
+AND PRODUCTGROUP = 'ST0001'
+AND YEARWEEK NOT IN (
+                     SELECT DISTINCT YEARWEEK
+                     FROM KOPO_CHANNEL_RESULT_NEW
+                    );
+
+-- 대/소문자 변경
+
+SELECT
+    UPPER(PRODUCT) AS CASE1,
+    LOWER(PRODUCT) AS CASE2
+    FROM KOPO_CHANNEL_SEASONALITY_NEW;
+    
+SELECT UPPER('askjdnkjqWDLKFJGNWgerwij') FROM DUAL;
+    
+
+-- 대/소문자 어느 것을 입력하든 입력문자/비교데이터 모두를
+-- 같은 형태로 통일하여 대/소문자 구분 필요가 없도록 함
+SELECT *
+    FROM KOPO_CHANNEL_SEASONALITY_NEW
+    WHERE 1=1
+    AND LOWER(REGIONID) = LOWER(&UI_INPUT1)  -- 모두 소문자로 통일
+    AND LOWER(PRODUCT) = LOWER(&UI_INPUT2);
+    -- AND UPPER(REGIONID) = UPPER(&UI_INPUT1)  -- 모두 대문자로 통일
+    -- AND UPPER(PRODUCT) = UPPER(&UI_INPUT2);
+    
+
+-- 컬럼 값 합치기
+SELECT 
+    CONCAT(REGIONID,CONCAT('_',PRODUCT)) AS KEYCOL1,
+    REGIONID||'_'||PRODUCT AS KEYCOL2
+FROM KOPO_CHANNEL_SEASONALITY_NEW;
+
+
+-- 컬럼 값 추출하기: SUBSTR
+
+SELECT SUBSTR ('201642', 1, 4) FROM DUAL;
+-- SELECT SUBSTR ('201642', 0, 4) FROM DUAL; -- 0으로 시작해도 무방(같은 결과)
+
+SELECT SUBSTR ('201642', 5, 6) FROM DUAL;
+-- FROM DUAL: 가상의 테이블 생성해줌 (단일행 함수 테스트/디버깅 용으로 편함)
+-- 비교: 스파크 SUBSTRING과의 차이 (시작인덱스 / 종료인덱스 포함,불포함 여부)
+-- 오라클 SUBSTR은 인덱스값 1부터 시작(맨왼쪽) / 시작인덱스, 종료인덱스 포함함
+
+
+
+-- 컬럼 값 채우기: LPAD / RPAD
+
+SELECT LPAD('UNQW23K', 13, 0) FROM DUAL;
+
+SELECT LPAD('UNQW23K', 13, '*') FROM DUAL;
+
+SELECT RPAD('UNQW23K', 13, 0) FROM DUAL;
+
+SELECT RPAD('UNQW23K', 13, '*') FROM DUAL;
+
+
+
+SELECT RPAD(CUSTOMERCODE, 12, '*')
+    FROM KOPO_CUSTOMERDATA;
+
