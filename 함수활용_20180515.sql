@@ -1,0 +1,90 @@
+
+
+--(P.23)
+-- KOPO_CUSTOMERDATA의 고객코드는10자리이다
+--만약 10자리가 아니면 왼쪽에 0으로 채운다
+--이후 고객코드의 뒷 4자리는 암호화를 위해 * 처리를
+--해야합니다.
+
+
+SELECT
+    REPLACE(LPAD(CUSTOMERCODE, 10, '0')
+    ,SUBSTR(CUSTOMERCODE, -4), '****')
+    AS CUSTOMERCODE_SECRET
+    FROM KOPO_CUSTOMERDATA;
+
+
+SELECT
+    CONCAT(
+    SUBSTR(
+    LPAD(CUSTOMERCODE, 10, '0'), 0, 6
+    ),'****'
+    ) AS CUSTOMERCODE_SECRET 
+    FROM KOPO_CUSTOMERDATA;
+    
+
+
+-- (P.26)
+-- NUMBER_EXAMPLE에
+-- FIRST/NUMBER를 활용하여 아래와 같은
+-- 결과를 출력하세요
+
+
+SELECT
+    FIRST_NUMBER
+    ,SECOND_NUMBER
+    ,(FIRST_NUMBER / SECOND_NUMBER) AS AVG
+    ,ROUND(FIRST_NUMBER / SECOND_NUMBER, 0) AS ROUND_EX
+    ,CEIL(FIRST_NUMBER / SECOND_NUMBER) AS CEIL_EX
+    ,FLOOR(FIRST_NUMBER / SECOND_NUMBER) AS FLLOR_EX
+    ,MOD(FIRST_NUMBER, SECOND_NUMBER) AS MOD_EX
+    ,POWER(FIRST_NUMBER, SECOND_NUMBER) AS POW_EX
+    FROM NUMBER_EXAMPLE;
+    
+    
+
+-- (P.27)
+-- RMSE_MAE_EXAMPLE2 테이블에서
+-- ACCURACY = 1 ? ABS(예측값-실제값) / 예측값 공식을 활용하여
+-- 정확도를 산출하세요 (소수점 2째자리 반올림)
+
+
+SELECT
+    YEARWEEK
+    ,ACTUAL
+    ,FCST
+    ,ROUND((1-ABS(FCST-ACTUAL)/FCST)*100, 2) AS ACCURACY
+    FROM RMSE_MAE_EXAMPLE2;
+
+
+SELECT *
+    FROM(
+        SELECT
+            YEARWEEK
+            ,ACTUAL
+            ,FCST
+            ,ROUND((1-ABS(FCST-ACTUAL)/FCST)*100, 2) AS ACCURACY
+            FROM RMSE_MAE_EXAMPLE2
+        )   
+    WHERE 1=1
+    AND ACCURACY < 50;  -- 정확도가 50% 미만인 데이터만 별도 추출
+    
+
+-- 날짜 함수
+
+SELECT
+    SYSDATE,  -- 오늘 날짜
+    SYSDATE+2,  -- 2일 후
+    NEXT_DAY(SYSDATE,2),  -- 다음주 2번째(월) 요일 (1~7 => 일~토)
+    LAST_DAY(SYSDATE)  -- 이번 달 마지막일
+FROM DUAL;
+
+
+-- CASE .. WHEN 문
+
+SELECT
+    YEARWEEK,
+    CASE WHEN QTY<1000 THEN 1000
+        WHEN QTY>1000 AND QTY < 10000 THEN 10000
+        ELSE 30000 END AS QTY
+    FROM KOPO_CHANNEL_SEASONALITY_NEW;
