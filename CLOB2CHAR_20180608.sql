@@ -1,0 +1,17 @@
+SELECT * FROM oracleresult_ejkim;
+
+SELECT * FROM RESULT_EJKIM_CLOB2CHAR;
+
+DESC RESULT_EJKIM_CLOB2CHAR;
+
+CREATE TABLE RESULT_EJKIM_CLOB2CHAR AS (
+    SELECT
+        TO_CHAR(CUSTID) CUSTID2
+        ,AVGPRICE
+        ,EMI
+        ,DEVICECOUNT
+        ,PRODUCTAGE
+        ,TO_CHAR(CUSTTYPE) CUSTTYPE2
+        FROM oracleresult_ejkim
+    );
+    
